@@ -1,5 +1,7 @@
 import { isDev } from "../utils/tools"
-export default {
+const settings =  {
   apiUrl: isDev ? 'dev.api' : 'pro.api',
-  title: 'vite-vue3-demo'
+  webSiteName: 'vite-vue3-demo'
 }
+
+export default settings
