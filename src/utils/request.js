@@ -1,10 +1,11 @@
 import axios from "axios";
 import { message } from "ant-design-vue";
-import { TOKEN } from "../config/type";
-import { getItem, setItem } from "./storage";
+import { getItem, setItem } from "@/utils/storage";
+import { TOKEN } from "@/config/type";
+import settings from "@/config/index";
 
 const instance = axios.create({
-  baseURL: process.env,
+  baseURL: settings.apiPrefix,
   timeout: 3000,
   headers: {
     'Content-Type': 'application/json',
@@ -24,9 +25,9 @@ instance.interceptors.request.use(function(config){
 })
 
 instance.interceptors.response.use(function(res){
-  const { accessToken, expireIn } = res.data
+  const { accessToken, expireIn } = res.data.data
   if (accessToken) {
-    setItem(TOKEN, accessToken, expireIn)
+    setItem(TOKEN, accessToken, expireIn * 1000)
   }
   return Promise.resolve(res)
 }, function(error){

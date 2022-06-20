@@ -2,22 +2,36 @@ import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   {
-    name: "/",
+    name: "index",
+    path: "/",
     component: () => import("@/layout/BaseLayout.vue"),
+    redirect: "/welcome",
+    meta: {
+      title: "主页",
+    },
     children: [
       {
-        name: "usersList",
+        name: "welcome",
+        path: "/welcome",
+        meta: { title: "欢迎页" },
+        component: () => import("@/views/welcome/index.vue"),
+      },
+      {
+        name: "userList",
         path: "/users/list",
+        meta: { title: "用户列表" },
         component: () => import("@/views/system/users/index.vue"),
       },
       {
         name: "rolesList",
         path: "/roles/list",
+        meta: { title: "角色列表" },
         component: () => import("@/views/system/roles/index.vue"),
       },
       {
         name: "permissionsList",
         path: "/permissions/list",
+        meta: { title: "权限列表" },
         component: () => import("@/views/system/permissions/index.vue"),
       },
     ],

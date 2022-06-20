@@ -4,6 +4,7 @@ import router from './router/index'
 import { createPinia } from 'pinia'
 import { message } from 'ant-design-vue'
 import 'ant-design-vue/es/message/style/css'
+import './permission' 
 
 const app = createApp(App)
 

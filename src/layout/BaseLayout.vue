@@ -5,18 +5,19 @@
       :width="200"
       :bodyStyle="{
         padding: 0,
+        backgroundColor: '#001529'
       }"
       placement="left"
       :closable="false"
       @close="() => (show = !show)"
     >
       <a-menu
-        id="dddddd"
+        id="mobileMenu"
         v-model:openKeys="openKeys"
         v-model:selectedKeys="selectedKeys"
         mode="inline"
         theme="dark"
-        @click="handleClick"
+        @click="handleMenuClick"
       >
         <a-sub-menu key="sub4">
           <template #icon>
@@ -48,12 +49,12 @@
         <img :src="logo" />
       </div>
       <a-menu
-        id="dddddd"
+        id="siderMenu"
         v-model:openKeys="openKeys"
         v-model:selectedKeys="selectedKeys"
         mode="inline"
         theme="dark"
-        @click="handleClick"
+        @click="handleMenuClick"
       >
         <a-sub-menu key="sub4">
           <template #icon>
@@ -66,7 +67,7 @@
         </a-sub-menu>
         <a-sub-menu key="sub5">
           <template #icon>
-            <SettingOutlined />
+            <DotChartOutlined />
           </template>
           <template #title>基础数据</template>
           <a-menu-item key="/cars/list">车型管理</a-menu-item>
@@ -75,18 +76,14 @@
       </a-menu>
     </a-layout-sider>
 
-    <a-layout class="layout-content">
+    <a-layout class="layout-content" :class="{fullscreen: isMobile}">
       <a-layout-header class="header">
         <menu-unfold-outlined
           v-if="collapsed"
           class="trigger"
-          @click="handleCollapsed"
+          @click="handleControlCollapsed"
         />
-        <menu-fold-outlined
-          v-else
-          class="trigger"
-          @click="handleCollapsed"
-        />
+        <menu-fold-outlined v-else class="trigger" @click="handleControlCollapsed" />
 
         <a-dropdown v-model:visible="visible">
           <a-avatar @click.prevent>
@@ -95,7 +92,7 @@
             </template>
           </a-avatar>
           <template #overlay>
-            <a-menu @click="handleMenuClick">
+            <a-menu @click="handleAvatarMenuClick">
               <a-menu-item key="resetpwd">重置密码</a-menu-item>
               <a-menu-item key="logout">退出登陆</a-menu-item>
             </a-menu>
@@ -106,15 +103,21 @@
         <!-- 多标签页 -->
         <div class="tabs-container">
           <a-tabs
-            type="card"
+            hideAdd
+            type="editable-card"
             v-model:activeKey="activeKey"
             :tabBarStyle="{
-              margin: 0 
+              margin: 0,
             }"
-            @tabClick="handleTab"
-            @contextmenu="handleContextmenu"
+            @tabClick="handleTabClick"
+            @edit="handleTabEdit"
           >
-            <a-tab-pane v-for="i in 10" :key="i" :tab="`Tab-${i}`"></a-tab-pane>
+            <a-tab-pane
+              v-for="item in pages"
+              :key="item.fullPath"
+              :tab="item.name"
+              ></a-tab-pane
+            >
           </a-tabs>
         </div>
         <router-view></router-view>
@@ -124,19 +127,19 @@
   </a-layout>
 </template>
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  MailOutlined,
-  QqOutlined,
   SettingOutlined,
-  AppstoreOutlined,
-  UserOutlined,
+  DotChartOutlined,
+  UserOutlined
 } from "@ant-design/icons-vue";
 import logo from "@/assets/logo.png";
 import config from "@/config";
-import { useRouter } from "vue-router";
+import { onBeforeRouteUpdate, useRouter, useRoute } from "vue-router";
+import { message } from "ant-design-vue";
+import { SMALLDEVICE } from "@/config/type";
 
 const webSiteName = ref(config.webSiteName);
 const selectedKeys = ref([]);
@@ -145,53 +148,89 @@ const visible = ref(false);
 let isMobile = ref(false);
 let show = ref(true);
 let collapsed = ref(false);
-let activeKey = ref('1');
+let activeKey = ref("/");
+let pages = reactive([]);
+const fullPathList = reactive([]);
 
 const router = useRouter();
+const route = useRoute();
 
 onMounted(() => {
-  resize()
-  window.addEventListener('resize', resize)
-})
-
-const tabScrollCallback = () => {}
-
+  resize();
+  window.addEventListener("resize", resize);
+  pages.push({
+    name: route.name,
+    fullPath: route.fullPath
+  });
+  fullPathList.push(route.fullPath);
+});
 const resize = (e) => {
-  const { width } = document.documentElement.getBoundingClientRect()
-  isMobile.value = width <= 750
+  const { width } = document.documentElement.getBoundingClientRect();
+  isMobile.value = width <= SMALLDEVICE;
+};
+
+onBeforeRouteUpdate((to, from) => {
+  if (!fullPathList.includes(to.fullPath)) {
+    pages.push({
+      name: to.name,
+      fullPath: to.fullPath
+    });
+    fullPathList.push(to.fullPath);
+    activeKey.value = to.fullPath
+  }
+});
+
+// 编辑tab
+const handleTabEdit = (key, action) => {
+  if (action === "remove") {
+    if (pages.length > 1) {
+      removeTab(key);
+    } else {
+      message.error("这是最后一个标签,无法被关闭");
+    }
+  }
+};
+// 移除tab
+const removeTab = (key) => {
+  const index = fullPathList.indexOf(key);
+  pages.splice(index, 1);
+  fullPathList.splice(index, 1);
+  router.push(fullPathList[fullPathList.length - 1])
+};
+// tab切换
+const handleTabClick = (key) => {
+  router.push(key)
 }
 
-// 菜单点击
-const handleClick = (e) => {
-  const { key } = e;
-  console.log(key);
-  router.push(key);
-};
 // 右上角 头像 菜单点击
-const handleMenuClick = (e) => {
+const handleAvatarMenuClick = (e) => {
   const { key } = e;
   // todo resetpwd logout
-  console.log(key);
+  console.log("头像下拉菜单", key);
 };
 
 // sider 折叠/收起
-const handleCollapsed = () => {
-  collapsed.value = !collapsed.valuee
-  show.value = !show.value
-}
-
-const handleTab = (key) => {
-  console.log('---', key)
-}
-
-// tab 标签右键
-const handleContextmenu = e => {
-  console.log('==.', e)
-  e.preventDefault()
-}
+const handleControlCollapsed = () => {
+  collapsed.value = !collapsed.value;
+  show.value = !show.value;
+};
+// 菜单点击
+const handleMenuClick = (e) => {
+  const { key } = e;
+  if (fullPathList.some((path) => path === key)) {
+    // 更新当前tab的位置
+    const index = fullPathList.indexOf(key);
+    const [currentRoute] = pages.splice(index, 1);
+    const [path] = fullPathList.splice(index, 1)
+    pages.push(currentRoute);
+    fullPathList.push(path)
+  } else {
+    router.push(key);
+  }
+};
 </script>
 <style scoped>
-.layout-sider {
+.fullscreen,.layout-sider {
   height: 100vh;
   overflow: hidden;
 }
@@ -228,5 +267,4 @@ const handleContextmenu = e => {
   background-color: white;
   box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.5);
 }
-
 </style>

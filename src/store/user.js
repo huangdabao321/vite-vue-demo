@@ -1,5 +1,5 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
-import { login } from '../api/login';
+import { getUserInfo } from '../api/login';
 
 export const useUserStore = defineStore({
   id: 'user',
@@ -10,11 +10,11 @@ export const useUserStore = defineStore({
 
   },
   actions: {
-    async login(params) {
-      const userData =  await login(params)
+    async getUserInfo(params) {
+      const userInfo =  await getUserInfo(params)
       this.$patch({
         userInfo,
-        ...userData
+        ...userInfo
       })
     }
   }
