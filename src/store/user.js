@@ -7,7 +7,6 @@ export const useUserStore = defineStore("user", {
   state: () => ({
     userInfo: null,
     roles: null,
-    permssions: null,
     routes: null,
   }),
   getters: {

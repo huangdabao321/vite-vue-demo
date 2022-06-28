@@ -28,7 +28,7 @@ instance.interceptors.response.use(function(response){
   const data = response.data
   const { accessToken, expireIn } = data.data
   if (accessToken) {
-    setItem(TOKEN, accessToken, expireIn * 1000)
+    setItem(TOKEN, accessToken, expireIn)
   }
   return Promise.resolve(data)
 }, function(error){

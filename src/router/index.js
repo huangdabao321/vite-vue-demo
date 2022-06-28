@@ -25,12 +25,7 @@ const routes = [
         name: "login",
         path: "login",
         component: () => import("@/views/user/login.vue"),
-      },
-      {
-        name: "404",
-        path: "/:pathMatch(.*)*",
-        component: () => import("@/views/errors/404.vue"),
-      },
+      }
     ],
   },
 ];

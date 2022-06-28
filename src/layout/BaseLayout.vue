@@ -1,6 +1,6 @@
 <template>
   <a-layout>
-    <a-drawer
+    <!-- <a-drawer
       :visible="show && isMobile"
       :width="200"
       :bodyStyle="{
@@ -24,8 +24,8 @@
             <SettingOutlined />
           </template>
           <template #title>系统设置</template>
-          <a-menu-item key="/users/list">用户管理</a-menu-item>
-          <a-menu-item key="/roles/list">角色管理</a-menu-item>
+          <a-menu-item key="/users">用户管理</a-menu-item>
+          <a-menu-item key="/roles">角色管理</a-menu-item>
           <a-menu-item key="/permissions/list">权限管理</a-menu-item>
         </a-sub-menu>
         <a-sub-menu key="sub5">
@@ -33,11 +33,11 @@
             <SettingOutlined />
           </template>
           <template #title>基础数据</template>
-          <a-menu-item key="/cars/list">车型管理</a-menu-item>
-          <a-menu-item key="/areas/list">地区管理</a-menu-item>
+          <a-menu-item key="/cars">车型管理</a-menu-item>
+          <a-menu-item key="/areas">地区管理</a-menu-item>
         </a-sub-menu>
       </a-menu>
-    </a-drawer>
+    </a-drawer> -->
     <a-layout-sider
       collapsible
       v-model:collapsed="collapsed"
@@ -56,26 +56,14 @@
         theme="dark"
         @click="handleMenuClick"
       >
-        <!-- <a-sub-menu key="sub4">
-          <template #icon>
-            <SettingOutlined />
+        <template v-for="item in menus" :key="item.path">
+          <template v-if="!item.children">
+            <a-menu-item>{{ item.meta.title }}</a-menu-item>
           </template>
-          <template #title>系统设置</template>
-          <a-menu-item key="/users/list">用户管理</a-menu-item>
-          <a-menu-item key="/roles/list">角色管理</a-menu-item>
-          <a-menu-item key="/permissions/list">权限管理</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub5">
-          <template #icon>
-            <DotChartOutlined />
+          <template v-else>
+            <SubMenu :menu-info="item" :key="item.path" />
           </template>
-          <template #title>基础数据</template>
-          <a-menu-item key="/cars/list">车型管理</a-menu-item>
-          <a-menu-item key="/areas/list">地区管理</a-menu-item>
-        </a-sub-menu> -->
-        <a-sub-menu v-for="(item, index) in menus" :key="index">
-          <a-menu-item :key="item.path">{{ item?.meta.title }}</a-menu-item>
-        </a-sub-menu>
+        </template>
       </a-menu>
     </a-layout-sider>
 
@@ -145,6 +133,7 @@ import logo from "@/assets/logo.png";
 import config from "@/config";
 import { onBeforeRouteUpdate, useRouter, useRoute } from "vue-router";
 import { message } from "ant-design-vue";
+import SubMenu from "@/components/CustomeMenu/SubMenu.vue";
 import { SMALLDEVICE } from "@/config/type";
 import { useUserStore } from "../store/user";
 
@@ -169,7 +158,7 @@ onMounted(() => {
   resize();
   window.addEventListener("resize", resize);
   pages.push({
-    name: route.name,
+    name: route.meta.title,
     fullPath: route.fullPath,
   });
   fullPathList.push(route.fullPath);
@@ -182,7 +171,7 @@ const resize = (e) => {
 onBeforeRouteUpdate((to, from) => {
   if (!fullPathList.includes(to.fullPath)) {
     pages.push({
-      name: to.name,
+      name: to.meta.title,
       fullPath: to.fullPath,
     });
     fullPathList.push(to.fullPath);

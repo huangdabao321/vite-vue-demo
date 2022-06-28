@@ -4,7 +4,7 @@ export function setItem(key, value, expire) {
   }
   window.localStorage.setItem(key, JSON.stringify(value));
   if (expire) {
-    window.localStorage.setItem(`${key}_expire`, new Date().getTime() + expire);
+    window.localStorage.setItem(`${key}_expire`, new Date().getTime() + expire * 1000);
   }
 }
 

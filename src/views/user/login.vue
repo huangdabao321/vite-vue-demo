@@ -51,7 +51,7 @@ const formState = reactive({
 
 const onFinish = (values) => {
   login(values)
-    .then((res) => {
+    .then(() => {
       router.push({ path: "/welcome" });
     })
     .catch((error) => {

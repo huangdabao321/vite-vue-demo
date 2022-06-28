@@ -65,8 +65,6 @@ export function listToTree(list, tree, parentId) {
 export function generator(routerMap) {
   return routerMap.map(item => {
     const currentRouter = {
-      id: item.id,
-      parentId: item.pid,
       // 如果路由设置了 path，则作为默认 path，否则 路由地址 动态拼接生成如 /dashboard/workplace
       path: item.path,
       // 路由名称，建议唯一
@@ -83,9 +81,10 @@ export function generator(routerMap) {
         target: reg.test(item.path) ? '_blank' : '',
         permission: [item.permission],
         keepAlive: item.keepAlive,
-        hiddenInMenu: item.hiddenInMenu
+        hiddenInMenu: item.hiddenInMenu,
+        hidden: item.hidden
       },
-      hidden: item.hidden
+      
     }
     // 为了防止出现后端返回结果不规范，处理有可能出现拼接出两个 反斜杠
     if (!currentRouter.path.startsWith('http')) {
