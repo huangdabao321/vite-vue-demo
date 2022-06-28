@@ -24,12 +24,13 @@ instance.interceptors.request.use(function(config){
   return Promise.reject(error)
 })
 
-instance.interceptors.response.use(function(res){
-  const { accessToken, expireIn } = res.data.data
+instance.interceptors.response.use(function(response){
+  const data = response.data
+  const { accessToken, expireIn } = data.data
   if (accessToken) {
     setItem(TOKEN, accessToken, expireIn * 1000)
   }
-  return Promise.resolve(res)
+  return Promise.resolve(data)
 }, function(error){
   const { response } = error
   if (response) {

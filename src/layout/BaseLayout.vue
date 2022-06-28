@@ -5,7 +5,7 @@
       :width="200"
       :bodyStyle="{
         padding: 0,
-        backgroundColor: '#001529'
+        backgroundColor: '#001529',
       }"
       placement="left"
       :closable="false"
@@ -56,7 +56,7 @@
         theme="dark"
         @click="handleMenuClick"
       >
-        <a-sub-menu key="sub4">
+        <!-- <a-sub-menu key="sub4">
           <template #icon>
             <SettingOutlined />
           </template>
@@ -72,18 +72,25 @@
           <template #title>基础数据</template>
           <a-menu-item key="/cars/list">车型管理</a-menu-item>
           <a-menu-item key="/areas/list">地区管理</a-menu-item>
+        </a-sub-menu> -->
+        <a-sub-menu v-for="(item, index) in menus" :key="index">
+          <a-menu-item :key="item.path">{{ item?.meta.title }}</a-menu-item>
         </a-sub-menu>
       </a-menu>
     </a-layout-sider>
 
-    <a-layout class="layout-content" :class="{fullscreen: isMobile}">
+    <a-layout class="layout-content" :class="{ fullscreen: isMobile }">
       <a-layout-header class="header">
         <menu-unfold-outlined
           v-if="collapsed"
           class="trigger"
           @click="handleControlCollapsed"
         />
-        <menu-fold-outlined v-else class="trigger" @click="handleControlCollapsed" />
+        <menu-fold-outlined
+          v-else
+          class="trigger"
+          @click="handleControlCollapsed"
+        />
 
         <a-dropdown v-model:visible="visible">
           <a-avatar @click.prevent>
@@ -116,8 +123,7 @@
               v-for="item in pages"
               :key="item.fullPath"
               :tab="item.name"
-              ></a-tab-pane
-            >
+            ></a-tab-pane>
           </a-tabs>
         </div>
         <router-view></router-view>
@@ -133,13 +139,14 @@ import {
   MenuUnfoldOutlined,
   SettingOutlined,
   DotChartOutlined,
-  UserOutlined
+  UserOutlined,
 } from "@ant-design/icons-vue";
 import logo from "@/assets/logo.png";
 import config from "@/config";
 import { onBeforeRouteUpdate, useRouter, useRoute } from "vue-router";
 import { message } from "ant-design-vue";
 import { SMALLDEVICE } from "@/config/type";
+import { useUserStore } from "../store/user";
 
 const webSiteName = ref(config.webSiteName);
 const selectedKeys = ref([]);
@@ -155,12 +162,15 @@ const fullPathList = reactive([]);
 const router = useRouter();
 const route = useRoute();
 
+const userStore = useUserStore();
+const menus = userStore.addRoutes;
+
 onMounted(() => {
   resize();
   window.addEventListener("resize", resize);
   pages.push({
     name: route.name,
-    fullPath: route.fullPath
+    fullPath: route.fullPath,
   });
   fullPathList.push(route.fullPath);
 });
@@ -173,10 +183,10 @@ onBeforeRouteUpdate((to, from) => {
   if (!fullPathList.includes(to.fullPath)) {
     pages.push({
       name: to.name,
-      fullPath: to.fullPath
+      fullPath: to.fullPath,
     });
     fullPathList.push(to.fullPath);
-    activeKey.value = to.fullPath
+    activeKey.value = to.fullPath;
   }
 });
 
@@ -195,12 +205,12 @@ const removeTab = (key) => {
   const index = fullPathList.indexOf(key);
   pages.splice(index, 1);
   fullPathList.splice(index, 1);
-  router.push(fullPathList[fullPathList.length - 1])
+  router.push(fullPathList[fullPathList.length - 1]);
 };
 // tab切换
 const handleTabClick = (key) => {
-  router.push(key)
-}
+  router.push(key);
+};
 
 // 右上角 头像 菜单点击
 const handleAvatarMenuClick = (e) => {
@@ -221,16 +231,17 @@ const handleMenuClick = (e) => {
     // 更新当前tab的位置
     const index = fullPathList.indexOf(key);
     const [currentRoute] = pages.splice(index, 1);
-    const [path] = fullPathList.splice(index, 1)
+    const [path] = fullPathList.splice(index, 1);
     pages.push(currentRoute);
-    fullPathList.push(path)
+    fullPathList.push(path);
   } else {
     router.push(key);
   }
 };
 </script>
 <style scoped>
-.fullscreen,.layout-sider {
+.fullscreen,
+.layout-sider {
   height: 100vh;
   overflow: hidden;
 }

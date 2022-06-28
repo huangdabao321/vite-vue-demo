@@ -5,11 +5,16 @@
     sub-title="Sorry, the page you visited does not exist."
   >
     <template #extra>
-      <a-button type="primary">Back Home</a-button>
+      <a-button type="primary" @click="backHome">Back Home</a-button>
     </template>
   </a-result>
 </template>
 
 <script setup>
-import { Result } from 'ant-design-vue'
+import { useRouter } from "vue-router";
+const router = useRouter();
+
+const backHome = () => {
+  router.push({ path: "/" });
+};
 </script>
