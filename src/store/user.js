@@ -1,25 +1,66 @@
-import { defineStore, acceptHMRUpdate } from 'pinia';
-import { getUserInfo } from '../api/login';
+import { defineStore } from "pinia";
+import store from "@/store";
+import { generateDynamicRouter, filterAsyncRouter } from './utils'
+import { getUserDetail } from "@/api/user";
 
-export const useUserStore = defineStore({
-  id: 'user',
+export const useUserStore = defineStore("user", {
   state: () => ({
-    userInfo: null
+    userInfo: null,
+    roles: null,
+    permssions: null,
+    routes: null,
   }),
   getters: {
-
+    addRoutes: (state) => state.routes,
   },
   actions: {
-    async getUserInfo(params) {
-      const userInfo =  await getUserInfo(params)
-      this.$patch({
-        userInfo,
-        ...userInfo
-      })
-    }
-  }
-})
+    getUserInfo() {
+      return new Promise((resolve, reject) => {
+        getUserDetail().then((res) => {
+          const result = res.data;
+          if (result.roles && result.roles.length) {
+            const roles = result.roles;
+            roles.permissions = result.roles
+              .map((role) => role.permissions)
+              .flat();
+            roles.permissionList = roles.permissions.map(p => p.permission)
+            roles.permissions.forEach((p) => {
+              if (p.actionList) {
+                p.actionList = JSON.parse(p.actionList);
+              } else {
+                p.actionList = [];
+              }
+            });
+            this.$patch((state) => {
+              state.roles = { ...roles };
+              state.userInfo = {
+                name: result.name,
+                mobile: result.mobile
+              }
+            });
+            resolve(res);
+          } else {
+            reject(new Error("没有路由权限"));
+          }
+        });
+      });
+    },
 
-if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useUserStore(), import.meta.hot))
+    generateRoutes(roles) {
+      return new Promise((resolve, reject) => {
+        generateDynamicRouter().then((routers) => {
+          const accessRoutes = filterAsyncRouter(routers, roles);
+          this.routes = accessRoutes;
+          resolve();
+        }).catch(error => {
+          reject(error)
+        })
+      });
+    },
+  },
+});
+
+
+export function useUserStoreWithOut() {
+  return useUserStore(store);
 }
