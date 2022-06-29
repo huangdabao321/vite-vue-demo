@@ -7,3 +7,11 @@ export function getUserDetail(params) {
     params: params
   })
 }
+
+export function getUserList(params) {
+  return request({
+    method: 'get',
+    url: '/users/list',
+    params: params
+  })
+}

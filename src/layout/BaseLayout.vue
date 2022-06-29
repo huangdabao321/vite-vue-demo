@@ -1,6 +1,6 @@
 <template>
   <a-layout>
-    <!-- <a-drawer
+    <a-drawer
       :visible="show && isMobile"
       :width="200"
       :bodyStyle="{
@@ -19,25 +19,16 @@
         theme="dark"
         @click="handleMenuClick"
       >
-        <a-sub-menu key="sub4">
-          <template #icon>
-            <SettingOutlined />
+        <template v-for="item in menus" :key="item.path">
+          <template v-if="!item.children">
+            <a-menu-item>{{ item.meta.title }}</a-menu-item>
           </template>
-          <template #title>系统设置</template>
-          <a-menu-item key="/users">用户管理</a-menu-item>
-          <a-menu-item key="/roles">角色管理</a-menu-item>
-          <a-menu-item key="/permissions/list">权限管理</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub5">
-          <template #icon>
-            <SettingOutlined />
+          <template v-else>
+            <SubMenu :menu-info="item" :key="item.path" />
           </template>
-          <template #title>基础数据</template>
-          <a-menu-item key="/cars">车型管理</a-menu-item>
-          <a-menu-item key="/areas">地区管理</a-menu-item>
-        </a-sub-menu>
+        </template>
       </a-menu>
-    </a-drawer> -->
+    </a-drawer>
     <a-layout-sider
       collapsible
       v-model:collapsed="collapsed"
@@ -58,7 +49,7 @@
       >
         <template v-for="item in menus" :key="item.path">
           <template v-if="!item.children">
-            <a-menu-item>{{ item.meta.title }}</a-menu-item>
+            <a-menu-item :key="item.path">{{ item.meta.title }}</a-menu-item>
           </template>
           <template v-else>
             <SubMenu :menu-info="item" :key="item.path" />
@@ -152,7 +143,7 @@ const router = useRouter();
 const route = useRoute();
 
 const userStore = useUserStore();
-const menus = userStore.addRoutes;
+const menus = userStore.addRoutes[0].children;
 
 onMounted(() => {
   resize();
@@ -175,8 +166,8 @@ onBeforeRouteUpdate((to, from) => {
       fullPath: to.fullPath,
     });
     fullPathList.push(to.fullPath);
-    activeKey.value = to.fullPath;
   }
+  activeKey.value = to.path;
 });
 
 // 编辑tab
@@ -216,16 +207,7 @@ const handleControlCollapsed = () => {
 // 菜单点击
 const handleMenuClick = (e) => {
   const { key } = e;
-  if (fullPathList.some((path) => path === key)) {
-    // 更新当前tab的位置
-    const index = fullPathList.indexOf(key);
-    const [currentRoute] = pages.splice(index, 1);
-    const [path] = fullPathList.splice(index, 1);
-    pages.push(currentRoute);
-    fullPathList.push(path);
-  } else {
-    router.push(key);
-  }
+  router.push(key);
 };
 </script>
 <style scoped>
@@ -252,7 +234,7 @@ const handleMenuClick = (e) => {
 }
 .trigger {
   color: #fff;
-  font-size: 30px;
+  font-size: 20px;
 }
 
 .layout-footer {

@@ -77,7 +77,7 @@ export function generator(routerMap) {
       // meta: 页面标题, 菜单图标, 页面权限(供指令权限用，可去掉)
       meta: {
         title: item.title,
-        // icon: iconfont[item.icon] || item.icon,
+        icon: item.icon,
         target: reg.test(item.path) ? '_blank' : '',
         permission: [item.permission],
         keepAlive: item.keepAlive,

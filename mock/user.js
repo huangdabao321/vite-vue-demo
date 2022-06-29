@@ -114,4 +114,44 @@ export default [
       }
     }
   },
+  {
+    url: '/api/users/list',
+    method: 'get',
+    response: () => {
+      return {
+        success: true,
+        message: '',
+        data: {
+          total: 2,
+          page: 1,
+          data: [
+            {
+              id: 1,
+              name: '宝哥',
+              mobile: '13888888888',
+              roles: [
+                {
+                  id: 1,
+                  name: 'admin',
+                  desc: '管理员'
+                }
+              ]
+            },
+            {
+              id: 2,
+              name: '张三',
+              mobile: '13888888887',
+              roles: [
+                {
+                  id: 1,
+                  name: 'shopManager',
+                  desc: '门店管理员'
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
 ]
