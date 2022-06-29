@@ -71,7 +71,7 @@
           @click="handleControlCollapsed"
         />
 
-        <a-dropdown v-model:visible="visible">
+        <a-dropdown v-model:visible="visible" :trigger="['click']">
           <a-avatar @click.prevent>
             <template #icon>
               <UserOutlined />
@@ -126,13 +126,14 @@ import { onBeforeRouteUpdate, useRouter, useRoute } from "vue-router";
 import { message } from "ant-design-vue";
 import SubMenu from "@/components/CustomeMenu/SubMenu.vue";
 import { SMALLDEVICE } from "@/config/type";
-import { useUserStore } from "../store/user";
+import { useUserStore } from "@/store/user";
+import { useMobile } from "@/hooks";
 
 const webSiteName = ref(config.webSiteName);
 const selectedKeys = ref([]);
 const openKeys = ref([]);
 const visible = ref(false);
-let isMobile = ref(false);
+let isMobile = useMobile()
 let show = ref(true);
 let collapsed = ref(false);
 let activeKey = ref("/");
@@ -146,18 +147,12 @@ const userStore = useUserStore();
 const menus = userStore.addRoutes[0].children;
 
 onMounted(() => {
-  resize();
-  window.addEventListener("resize", resize);
   pages.push({
     name: route.meta.title,
     fullPath: route.fullPath,
   });
   fullPathList.push(route.fullPath);
 });
-const resize = (e) => {
-  const { width } = document.documentElement.getBoundingClientRect();
-  isMobile.value = width <= SMALLDEVICE;
-};
 
 onBeforeRouteUpdate((to, from) => {
   if (!fullPathList.includes(to.fullPath)) {
