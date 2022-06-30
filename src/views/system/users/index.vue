@@ -29,8 +29,12 @@
           }"
         >
           <a-select-option :value="0" disabled>请选择</a-select-option>
-          <a-select-option :value="1">管理员</a-select-option>
-          <a-select-option :value="2">门店管理员</a-select-option>
+          <a-select-option
+            v-for="role in roles"
+            :key="role.name"
+            :value="role.id"
+            >{{ role.desc }}</a-select-option
+          >
         </a-select>
       </a-form-item>
       <a-form-item label="状态">
@@ -72,18 +76,22 @@
           </a-space>
         </a-space>
         <a-space v-else-if="column.dataIndex === 'action'">
-          <a-button type="primary">编辑</a-button>
+          <a-button type="primary" @click="handleEdit(record)">编辑</a-button>
           <a-button type="danger">禁用</a-button>
         </a-space>
       </template>
     </a-table>
   </a-card>
+  <CreateForm :visible="visible" :title="title" :model="model" @cancel="onCancel" @ok="onOk" />
 </template>
 
 <script setup>
 import { onMounted, reactive, ref } from "vue";
 import { getUserList } from "@/api/user";
+import { getRoleList } from "@/api/role";
 import { useMobile } from "@/hooks";
+import { message } from "ant-design-vue";
+import CreateForm from "./CreateForm.vue";
 
 const isMobile = useMobile();
 const formState = reactive({
@@ -126,6 +134,21 @@ const pagination = ref({
 
 const dataSource = ref([]);
 
+const roles = ref([]);
+onMounted(() => {
+  queryRoles();
+});
+
+const queryRoles = () => {
+  getRoleList()
+    .then((res) => {
+      roles.value = res.data;
+    })
+    .catch((error) => {
+      message.error(error);
+    });
+};
+
 onMounted(() => {
   queryData();
 });
@@ -145,12 +168,36 @@ const queryData = (p) => {
   });
 };
 // 分页
-const handleTableChange = (pag) => {
-  pagination.value = { ...pag };
+const handleTableChange = (args) => {
+  pagination.value = { ...args };
   queryData();
 };
 
-const handleNew = () => {};
+let visible = ref(false);
+let title = ref("新增");
+const model = ref({
+  id: 0,
+  name: "",
+  mobile: "",
+  roles: [],
+});
+const handleNew = () => {
+  visible.value = true;
+};
+
+const handleEdit = (record) => {
+  model.value = { ...model.value, ...record}
+  model.value.roles = model.value.roles.map(role => role.id)
+  title.value = '编辑'
+  visible.value = true;
+};
+
+const onCancel = (val) => {
+  visible.value = val;
+};
+const onOk = (val) => {
+  visible.value = val;
+};
 </script>
 
 <style lang="less" scoped>
