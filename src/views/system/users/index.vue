@@ -182,6 +182,12 @@ const model = ref({
   roles: [],
 });
 const handleNew = () => {
+  model.value = {
+    id: 0,
+    name: '',
+    mobile: '',
+    roles: []
+  }
   visible.value = true;
 };
 
