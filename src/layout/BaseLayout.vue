@@ -209,7 +209,6 @@ const handleMenuClick = (e) => {
 .fullscreen,
 .layout-sider {
   height: 100vh;
-  overflow: hidden;
 }
 .header {
   display: flex;

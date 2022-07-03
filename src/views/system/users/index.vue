@@ -88,7 +88,7 @@
 <script setup>
 import { onMounted, reactive, ref } from "vue";
 import { getUserList } from "@/api/user";
-import { getRoleList } from "@/api/role";
+import { getRoles } from "@/api/role";
 import { useMobile } from "@/hooks";
 import { message } from "ant-design-vue";
 import CreateForm from "./CreateForm.vue";
@@ -140,7 +140,7 @@ onMounted(() => {
 });
 
 const queryRoles = () => {
-  getRoleList()
+  getRoles()
     .then((res) => {
       roles.value = res.data;
     })

@@ -52,7 +52,7 @@
 <script setup>
 import { reactive, ref, onMounted, watch, toRefs } from "vue";
 import { useMobile } from "@/hooks";
-import { getRoleList } from "@/api/role";
+import { getRoles } from "@/api/role";
 const isMobile = useMobile();
 
 const props = defineProps({
@@ -73,7 +73,7 @@ const props = defineProps({
 const roles = ref([]);
 onMounted(() => {
   console.log('挂载')
-  getRoleList().then((res) => {
+  getRoles().then((res) => {
     roles.value = res.data;
   });
 });
