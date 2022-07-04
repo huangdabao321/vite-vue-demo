@@ -18,7 +18,10 @@ export default [
             permission: 'index',
             hiddenInMenu: false,
             hidden: false,
-            redirect: '/welcome'
+            redirect: '/welcome',
+            actions: [
+
+            ]
           },
           {
             id: 2,
@@ -31,7 +34,9 @@ export default [
             permission: 'index',
             hiddenInMenu: false,
             hidden: false,
-            redirect: ''
+            redirect: '',
+            actions: []
+
           },
           {
             id: 3,
@@ -44,7 +49,8 @@ export default [
             permission: 'system',
             hiddenInMenu: false,
             hidden: false,
-            redirect: '/users'
+            redirect: '/users',
+            actions: []
           },
           {
             id: 4,
@@ -57,6 +63,23 @@ export default [
             permission: 'users',
             hiddenInMenu: false,
             hidden: false,
+            actions: [
+              {
+                id: 1,
+                name: 'query',
+                desc: '查询'
+              },
+              {
+                id: 2,
+                name: 'add',
+                desc: '新建'
+              },
+              {
+                id: 3,
+                name: 'del',
+                desc: '删除'
+              },
+            ]
           },
           {
             id: 5,
@@ -69,7 +92,8 @@ export default [
             permission: 'roles',
             hiddenInMenu: false,
             hidden: false,
-            redirect: ''
+            redirect: '',
+            actions: []
           },
           {
             id: 6,
@@ -82,7 +106,8 @@ export default [
             permission: 'permissions',
             hiddenInMenu: false,
             hidden: false,
-            redirect: ''
+            redirect: '',
+            actions: []
           },
         ]
       }

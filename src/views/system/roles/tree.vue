@@ -33,7 +33,7 @@ const props = defineProps({
     default: () => [],
   },
 });
-const value = toRefs(props);
+const { value } = toRefs(props);
 const emits = defineEmits(["update:value"]);
 const selectedKeys = ref([]);
 const checkedKeys = ref([]);
@@ -44,49 +44,38 @@ onMounted(() => {
     const list = [];
     listToTree(res.data, list, 0);
     treeData.value = list;
+    initCheckedKeys()
   });
 });
 
-const initCheckedKeys = (data) => {
+const initCheckedKeys = () => {
   const keys = [];
   const initKeys = unref(value.value);
+  const data = treeData.value;
   filterCheckedKeys(data, keys, initKeys);
-  console.log('initKeys===>', initKeys)
-  console.log('keys===>', keys)
-  checkedKeys.value = keys
+  checkedKeys.value = keys;
 };
 
 const filterCheckedKeys = (data, keys, initKeys) => {
-  for (let i = 0; i < data.length; i++) {
-    const { children } = data[i];
-    if (data[i].pid !== 0 && children.every(child => initKeys.includes(child.id))) {
-      keys.push(data[i].id)
-    } 
-    for (let j = 0; j < children.length; j++) {
-      if (initKeys.includes(children[j].id)) {
-        keys.push(children[i].id)
+  data.forEach(item => {
+    const { children } = item
+    if (children && children.length) {
+      if (children.every(child => initKeys.includes(child.id))) {
+        keys.push(item.id)
+      } else {
+        filterCheckedKeys(children, keys, initKeys)
       }
-      if (children[i].children) {
-        filterCheckedKeys(children[i].children, keys, initKeys)
-      }
+    } else if (initKeys.includes(item.id)) {
+      keys.push(item.id)
     }
-  }
+  })
 };
 
-watch(
-  value.value,
-  (newVal) => {
-    newVal.length && initCheckedKeys(treeData.value);
-  },
-  {
-    immediate: true,
-  }
-);
-
-
+watch(value.value, (newVal) => {
+  newVal.length && initCheckedKeys();
+});
 
 const onCheck = (checkedKeys, { halfCheckedKeys }) => {
-  console.log("checkedKeys", [].concat(checkedKeys, halfCheckedKeys));
   emits("update:value", [].concat(checkedKeys, halfCheckedKeys));
   formItemContext.onFieldChange();
 };

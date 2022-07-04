@@ -69,6 +69,7 @@
     :visible="visible"
     :title="title"
     :maskClosable="false"
+    destroyOnClose
     @close="onClose"
   >
     <a-form
